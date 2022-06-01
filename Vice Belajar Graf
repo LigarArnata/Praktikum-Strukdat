@@ -1,0 +1,44 @@
+// Vice Belajar Graf
+
+#include <bits/stdc++.h>
+using namespace std;
+
+vector<int> adjList[101];
+bool visited[101];
+
+void DFS(int i){
+   visited[i]=1;
+    for(int j = 0; j < adjList[i].size(); j++){
+        int vertex = adjList[i][j];
+        if(!visited[vertex]){
+            DFS(vertex);
+        }
+    }
+}
+
+int main(void)
+{
+    int V, N, A, B;
+    int connectedgraf = 0;
+
+    cin >> V >> N;
+    for(int i = 0; i <= V; i++){
+        visited[i] = 0;
+    }
+    for(int i = 0; i < N; i++){
+        cin >> A >> B;
+        adjList[A].push_back(B);
+        adjList[B].push_back(A);
+    }
+    for(int i = 1; i <= V; i++){
+        if(!visited[i]){
+            DFS(i);
+            connectedgraf++;
+        }
+    }
+    connectedgraf = connectedgraf - 1;
+
+    cout << connectedgraf << endl;
+    
+    return 0;
+}
