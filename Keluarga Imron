@@ -1,0 +1,172 @@
+// Keluarga Imron
+
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+#define MAX 10000
+
+typedef struct bstnode_t
+{
+    int key;
+    char *nama_kota;
+    struct bstnode_t
+        *left,
+        *right;
+} BSTNode;
+
+typedef struct bst_t
+{
+    BSTNode *_root;
+    unsigned int _size;
+} BST;
+
+BSTNode *_bst_createNode(int id, char *nama_kota)
+{
+    BSTNode *newNode = (BSTNode *)malloc(sizeof(BSTNode));
+    newNode->key = id;
+    newNode->nama_kota = malloc(MAX * sizeof(char));
+    strcpy(newNode->nama_kota, nama_kota);
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+BSTNode *_bst_insert(BSTNode *root, int id, char *nama_kota)
+{
+    if (root == NULL)
+        return _bst_createNode(id, nama_kota);
+
+    if (id < root->key)
+        root->left = _bst_insert(root->left, id, nama_kota);
+    else if (id > root->key)
+        root->right = _bst_insert(root->right, id, nama_kota);
+
+    return root;
+}
+
+BSTNode *_bst_search(BSTNode *root, int id)
+{
+    while (root != NULL)
+    {
+        if (id < root->key)
+            root = root->left;
+        else if (id > root->key)
+            root = root->right;
+        else
+            return root;
+    }
+    return root;
+}
+
+BSTNode *_bst_findMinNode(BSTNode *node)
+{
+    BSTNode *currNode = node;
+    while (currNode && currNode->left != NULL)
+        currNode = currNode->left;
+
+    return currNode;
+}
+
+BSTNode *_bst_remove(BSTNode *root, int id)
+{
+    if (root == NULL)
+        return NULL;
+
+    if (id > root->key)
+        root->right = _bst_remove(root->right, id);
+    else if (id < root->key)
+        root->left = _bst_remove(root->left, id);
+    else
+    {
+
+        if (root->left == NULL)
+        {
+            BSTNode *rightChild = root->right;
+            free(root);
+            return rightChild;
+        }
+        else if (root->right == NULL)
+        {
+            BSTNode *leftChild = root->left;
+            free(root);
+            return leftChild;
+        }
+
+        BSTNode *temp = _bst_findMinNode(root->right);
+        root->key = temp->key;
+        root->right = _bst_remove(root->right, temp->key);
+    }
+    return root;
+}
+
+void bst_init(BST *bst)
+{
+    bst->_root = NULL;
+    bst->_size = 0u;
+}
+
+bool bst_isEmpty(BST *bst)
+{
+    return bst->_root == NULL;
+}
+
+bool bst_find(BST *bst, int id)
+{
+    BSTNode *temp = _bst_search(bst->_root, id);
+    if (temp == NULL)
+        return false;
+
+    if (temp->key == id)
+        return true;
+    else
+        return false;
+}
+
+void bst_insert(BST *bst, int id, char *nama_kota)
+{
+    if (!bst_find(bst, id))
+    {
+        bst->_root = _bst_insert(bst->_root, id, nama_kota);
+        bst->_size++;
+    }
+}
+
+BSTNode *lokasi(BSTNode *root, int x, int y)
+{
+    while (root != NULL)
+    {
+        if (root->key > x && root->key > y)
+            root = root->left;
+        else if (root->key < x && root->key < y)
+            root = root->right;
+        else
+            break;
+    }
+    return root;
+}
+
+int main()
+{
+    BST set;
+    bst_init(&set);
+
+    int n, id;
+    char nama_kota[MAX];
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++)
+    {
+        scanf("%d %s", &id, nama_kota);
+        bst_insert(&set, id, nama_kota);
+    }
+
+    int t, x, y;
+    scanf("%d", &t);
+    for (int i = 0; i < t; i++)
+    {
+        scanf("%d %d", &x, &y);
+        if (bst_find(&set, x) && bst_find(&set, y))
+            printf("%s\n", lokasi(set._root, x, y)->nama_kota);
+    }
+
+    return 0;
+}
