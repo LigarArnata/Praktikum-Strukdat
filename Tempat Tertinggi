@@ -1,0 +1,38 @@
+// Tempat Tertinggi
+
+#include <iostream>
+using namespace std;
+
+int main()
+{
+  int t, n, m;
+  
+  cin >> t;
+  for(int i=1;i<=t;i++){
+    cin >> n >> m;
+    char matriks[n+1][m+1];
+    for(int j=0;j<n;j++){
+        for(int k=0;k<m;k++){
+            cin >> matriks[j][k];
+        }
+    }
+    
+    for(int k=0;k<m;k++){
+        for(int j=n-2;j>=0;j--){
+            int l=j;
+            while(matriks[l][k]=='*' && matriks[l+1][k]=='.'){
+                matriks[l][k]='.';
+                matriks[l+1][k]='*';
+                l++;
+            }
+        }
+    }
+    
+    for(int j=0;j<n;j++){
+        for(int k=0;k<m;k++){
+            cout << matriks[j][k];
+        }
+        cout << "\n";
+    }
+  }
+}
