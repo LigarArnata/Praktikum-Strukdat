@@ -1,0 +1,225 @@
+// Cewe
+
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+
+typedef struct bstnode_t
+{
+    int key, index;
+    struct bstnode_t
+        *left,
+        *right;
+} BSTNode;
+
+typedef struct bst_t
+{
+    BSTNode *_root;
+    unsigned int _size;
+} BST;
+
+/**
+ * !!! WARNING UTILITY FUNCTION !!!
+ * Recognized by prefix "__bst__"
+ * ---------------------------------------------
+ * Note that you better never access these functions,
+ * unless you need to modify or you know how these functions work.
+ */
+
+int parent;
+
+BSTNode *__bst__createNode(int value)
+{
+    BSTNode *newNode = (BSTNode *)malloc(sizeof(BSTNode));
+    newNode->key = value;
+    newNode->left = newNode->right = NULL;
+    newNode->index = 0;
+    return newNode;
+}
+
+BSTNode *__bst__insert(BSTNode *root, int value)
+{
+    if (root == NULL)
+        return __bst__createNode(value);
+
+    if (value < root->key)
+    {
+        root->index++;
+        root->left = __bst__insert(root->left, value);
+    }
+    else if (value > root->key)
+    {
+        root->right = __bst__insert(root->right, value);
+    }
+
+    return root;
+}
+
+BSTNode *__bst__search(BSTNode *root, int value)
+{
+    parent = 0;
+    while (root != NULL)
+    {
+        if (value < root->key)
+        {
+            root = root->left;
+        }
+        else if (value > root->key)
+        {
+            parent += root->index + 1;
+            root = root->right;
+        }
+        else
+            return root;
+    }
+    return root;
+}
+
+BSTNode *__bst__search2(BSTNode *root, int value)
+{
+    parent = 0;
+    while (root != NULL)
+    {
+        if (value < root->key)
+        {
+            if (value == root->left->key && root->left != NULL)
+            {
+                break;
+            }
+            root = root->left;
+        }
+        else if (value > root->key)
+        {
+            parent += root->index + 1;
+            if (value == root->right->key && root->right != NULL)
+            {
+                break;
+            }
+            root = root->right;
+        }
+        else
+            return root;
+    }
+    return root;
+}
+
+BSTNode *__bst__findMinNode(BSTNode *node)
+{
+    BSTNode *currNode = node;
+    while (currNode && currNode->left != NULL)
+        currNode = currNode->left;
+
+    return currNode;
+}
+
+void bst_init(BST *bst)
+{
+    bst->_root = NULL;
+    bst->_size = 0u;
+}
+
+bool bst_isEmpty(BST *bst)
+{
+    return bst->_root == NULL;
+}
+
+int bst_find(BST *bst, int value)
+{
+    BSTNode *temp = __bst__search(bst->_root, value);
+    if (temp == NULL)
+        return 0;
+
+    if (temp->key == value)
+    {
+        return temp->index + parent + 1;
+    }
+    else
+        return 0;
+}
+
+int bst_find2(BST *bst, int value)
+{
+    BSTNode *temp = __bst__search2(bst->_root, value);
+    if (temp == NULL)
+        return 0;
+    if (temp->key == value)
+    {
+        return 0;
+    }
+    else
+    {
+        return temp->key;
+    }
+}
+
+void bst_insert(BST *bst, int value)
+{
+    if (!bst_find(bst, value))
+    {
+        bst->_root = __bst__insert(bst->_root, value);
+        bst->_size++;
+    }
+}
+
+void findParent(BSTNode *node, int val, int parent)
+{
+    if (node == NULL)
+    {
+        return;
+    }
+
+    if (node->key == val)
+    {
+        if (parent == -1)
+        {
+            printf("ini anak siapa dah\n");
+        }
+        else
+            printf("%d\n", parent);
+    }
+
+    else
+    {
+        findParent(node->left, val, node->key);
+        findParent(node->right, val, node->key);
+    }
+}
+
+int main()
+{
+    BST set;
+    bst_init(&set);
+
+    int N, value;
+    char perintah[20];
+    scanf("%d", &N);
+    for (int i = 0; i < N; i++)
+    {
+        scanf("%s", perintah);
+        if (strcmp(perintah, "masukin") == 0)
+        {
+            scanf("%d", &value);
+            bst_insert(&set, value);
+        }
+        else if (strcmp(perintah, "berapa") == 0)
+        {
+            scanf("%d", &value);
+            int hasil = bst_find(&set, value);
+            if (hasil != 0)
+            {
+                printf("%d\n", hasil);
+            }
+        }
+        else if (strcmp(perintah, "anaksiapa") == 0)
+        {
+            scanf("%d", &value);
+            if (bst_find(&set, value))
+                findParent(set._root, value, -1);
+            else
+                printf("ini anak siapa dah\n");
+        }
+    }
+
+    return 0;
+}
